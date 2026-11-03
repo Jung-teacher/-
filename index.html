@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신기한 기체 탐험대 🎈 - 초등 4학년 과학</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #f0f9ff;
+        }
+        /* 카드 3D 뒤집기 애니메이션 스타일 */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-4 md:p-8">
+
+    <!-- 헤더 영역 -->
+    <header class="text-center mb-6">
+        <h1 class="text-3xl md:text-5xl text-sky-600 drop-shadow-md mb-2">🎈 신기한 기체 탐험대 🧪</h1>
+        <p class="text-gray-600 text-sm md:text-lg">카드를 콕 눌러 기체의 성질과 쓰임새를 조사해 보세요!</p>
+    </header>
+
+    <!-- 메인 기체 카드 그리드 영역 -->
+    <main class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2" id="card-grid">
+        <!-- 자바스크립트로 카드가 동적 생성됩니다 -->
+    </main>
+
+    <!-- 하단 퀴즈 열기 버튼 영역 -->
+    <div class="mt-10 mb-6 text-center">
+        <button onclick="openQuizModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-lg md:text-xl font-bold px-8 py-4 rounded-3xl shadow-lg transition transform hover:scale-105 flex items-center justify-center gap-2 mx-auto">
+            <span>✨ 조사를 마쳤다면 퀴즈를 풀어볼까요? 📝</span>
+        </button>
+    </div>
+
+    <!-- 퀴즈 모달 팝업 영역 -->
+    <div id="quiz-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border-4 border-indigo-300">
+            <!-- 모달 헤더 -->
+            <div class="bg-indigo-500 text-white p-4 flex items-center justify-between">
+                <h2 class="text-xl md:text-2xl font-bold">🧠 기체 실력 뽐내기 퀴즈 (총 8문제)</h2>
+                <button onclick="closeQuizModal()" class="text-white hover:bg-indigo-600 px-3 py-1 rounded-xl text-xl font-bold">✕</button>
+            </div>
+            <!-- 모달 바디 (질문 목록) -->
+            <div class="p-6 overflow-y-auto flex flex-col gap-6" id="quiz-list-container">
+                <!-- 퀴즈 항목들이 동적 생성됩니다 -->
+            </div>
+            <!-- 모달 푸터 -->
+            <div class="bg-gray-100 p-4 text-center border-t border-gray-200">
+                <button onclick="closeQuizModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-2xl">
+                    확인 완료!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="mt-4 text-center text-gray-500 text-sm pb-4">
+        <p>초등학교 4학년 과학 공부 도움말 웹페이지 🌟 즐겁게 탐험해 봐요!</p>
+    </footer>
+
+    <!-- 자바스크립트 데이터 및 로직 -->
+    <script>
+        const gases = [
+            {
+                id: "nitrogen",
+                name: "질소",
+                symbol: "N₂",
+                emoji: "🍟",
+                hintText: "바삭바삭 맛있는 과자가 부서지지 않게 봉지 속을 빵빵하게 채우는 기체는?",
+                property: "색깔도, 냄새도, 맛도 없어요. 다른 물질과 쉽게 반응하지 않는 안전한 기체랍니다.",
+                usage: "과자 봉지를 빵빵하게 채워 과자를 보호하고, 식품을 신선하게 보관해요.",
+                quiz: {
+                    question: "1. 과자 봉지 속에 들어있는 안전한 기체는?",
+                    options: ["산소", "질소", "이산화탄소", "수소"],
+                    answer: 1
+                }
+            },
+            {
+                id: "oxygen",
+                name: "산소",
+                symbol: "O₂",
+                emoji: "🫁",
+                hintText: "숨을 쉴 때 꼭 필요하고, 모닥불이 활활 잘 타도록 돕는 기체는?",
+                property: "색깔과 냄새가 없지만 생물이 살아가는 데 꼭 필요하고, 불에 잘 타게 해줘요.",
+                usage: "병원 산소 호흡기, 잠수부의 산소통, 우주비행사 생명 유지 장치에 쓰여요.",
+                quiz: {
+                    question: "2. 생물이 숨을 쉴 때 반드시 필요한 기체는?",
+                    options: ["네온", "산소", "아르곤", "헬륨"],
+                    answer: 1
+                }
+            },
+            {
+                id: "co2",
+                name: "이산화탄소",
+                symbol: "CO₂",
+                emoji: "🥤",
+                hintText: "탄산음료를 마실 때 목을 톡 쏘게 만들고, 불을 끌 때 쓰이는 기체는?",
+                property: "물에 잘 녹으며, 불을 꺼지게 하는 성질을 가지고 있어요.",
+                usage: "콜라·사이다의 톡 쏘는 탄산, 불을 끄는 소화기 속 재료로 사용돼요.",
+                quiz: {
+                    question: "3. 콜라를 마실 때 톡 쏘는 기체의 이름은?",
+                    options: ["이산화탄소", "수증기", "질소", "네온"],
+                    answer: 0
+                }
+            },
+            {
+                id: "helium",
+                name: "헬륨",
+                symbol: "He",
+                emoji: "🎈",
+                hintText: "공기보다 가벼워서 알록달록 풍선을 하늘 높이 뜨게 하는 기체는?",
+                property: "공기보다 매우 가볍고, 불에 타지 않는 아주 안전한 기체예요.",
+                usage: "놀이공원 풍선, 목소리가 변하는 이벤트 가스, 기상 관측 기구에 쓰여요.",
+                quiz: {
+                    question: "4. 풍선을 하늘 높이 두둥실 띄우는 기체는?",
+                    options: ["산소", "아르곤", "헬륨", "수소"],
+                    answer: 2
+                }
+            },
+            {
+                id: "neon",
+                name: "네온",
+                symbol: "Ne",
+                emoji: "💡",
+                hintText: "어두운 밤거리의 간판에서 화려하고 알록달록한 빛을 내는 기체는?",
+                property: "유리관에 넣고 전기를 연결하면 예쁜 붉은빛이나 주황빛을 내요.",
+                usage: "밤거리를 밝히는 화려한 네온사인 간판에 사용돼요.",
+                quiz: {
+                    question: "5. 화려한 간판(네온사인) 빛을 내는 기체는?",
+                    options: ["질소", "네온", "수증기", "산소"],
+                    answer: 1
+                }
+            },
+            {
+                id: "steam",
+                name: "수증기",
+                symbol: "H₂O",
+                emoji: "♨️",
+                hintText: "뜨거운 밥솥 구멍에서 하얗게 피어오르는 김의 정체는?",
+                property: "물이 끓어서 변한 눈에 보이지 않는 기체 상태예요. 차가워지면 물방울이 돼요.",
+                usage: "밥솥에서 나오는 김, 목욕탕 안의 김, 구름과 비가 되는 재료예요.",
+                quiz: {
+                    question: "6. 물이 열을 받아 기체로 변한 상태를 무엇이라 할까요?",
+                    options: ["수증기", "이산화탄소", "헬륨", "아르곤"],
+                    answer: 0
+                }
+            },
+            {
+                id: "argon",
+                name: "아르곤",
+                symbol: "Ar",
+                emoji: "🏮",
+                hintText: "투명한 전구 속에서 필라멘트가 쉽게 타지 않도록 감싸 보호해 주는 기체는?",
+                property: "다른 물질과 절대 반응하지 않는 매우 얌전하고 안정적인 기체예요.",
+                usage: "전구 안의 필라멘트 보호, 금속을 용접할 때 공기를 막아주는 역할에 쓰여요.",
+                quiz: {
+                    question: "7. 전구 안을 채워 필라멘트를 보호하는 얌전한 기체는?",
+                    options: ["수소", "아르곤", "산소", "이산화탄소"],
+                    answer: 1
+                }
+            },
+            {
+                id: "hydrogen",
+                name: "수소",
+                symbol: "H₂",
+                emoji: "🚗",
+                hintText: "우주에서 가장 흔하고 세상에서 가장 가벼우며, 미래 친환경 차의 연료가 되는 기체는?",
+                property: "모든 기체 중 제일 가볍고 불이 아주 잘 붙는 성질을 가지고 있어요.",
+                usage: "연기가 나지 않는 깨끗한 친환경 수소차의 미래 에너지 연료로 쓰여요.",
+                quiz: {
+                    question: "8. 세상에서 가장 가볍고 수소차의 연료로 쓰이는 기체는?",
+                    options: ["질소", "네온", "수소", "헬륨"],
+                    answer: 2
+                }
+            }
+        ];
+
+        // 카드 렌더링
+        function renderCards() {
+            const grid = document.getElementById('card-grid');
+            grid.innerHTML = gases.map((gas, index) => `
+                <div class="card perspective-1000 h-[420px] cursor-pointer" onclick="flipCard(this)">
+                    <div class="card-inner shadow-lg rounded-3xl">
+                        
+                        <!-- 앞면 (이모지 + 힌트) -->
+                        <div class="card-front bg-white border-4 border-sky-300 p-6 flex flex-col items-center justify-between text-center select-none">
+                            <div class="w-full">
+                                <span class="inline-block bg-sky-100 text-sky-800 text-sm font-bold px-3 py-1 rounded-full mb-2">
+                                    미스터리 기체 #${index + 1}
+                                </span>
+                            </div>
+
+                            <!-- 이모지 일러스트 -->
+                            <div class="text-6xl my-2 bg-sky-50 w-24 h-24 rounded-full flex items-center justify-center border-2 border-sky-100 shadow-inner">
+                                ${gas.emoji}
+                            </div>
+
+                            <!-- 힌트 문장 -->
+                            <p class="text-gray-700 text-sm md:text-base font-medium px-1 leading-relaxed">
+                                💡 "${gas.hintText}"
+                            </p>
+
+                            <div class="w-full bg-sky-500 text-white font-bold py-2.5 rounded-2xl shadow hover:bg-sky-600 transition text-sm">
+                                👆 카드를 눌러 정보 보기
+                            </div>
+                        </div>
+
+                        <!-- 뒷면 (기체 정보) -->
+                        <div class="card-back bg-gradient-to-b from-sky-50 to-white border-4 border-indigo-300 p-5 flex flex-col justify-between overflow-y-auto" onclick="event.stopPropagation()">
+                            <div>
+                                <div class="flex items-center justify-between border-b-2 border-sky-200 pb-2 mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-2xl font-bold text-indigo-900">${gas.name}</h2>
+                                        <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-bold">${gas.symbol}</span>
+                                    </div>
+                                    <button onclick="unflipCard(this)" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2.5 py-1 rounded-lg font-bold">
+                                        🔄 다시 뒤집기
+                                    </button>
+                                </div>
+
+                                <!-- 성질 -->
+                                <div class="mb-3 bg-amber-50 p-3 rounded-xl border border-amber-200">
+                                    <h4 class="text-xs font-bold text-amber-800 mb-1">✨ 기체의 성질</h4>
+                                    <p class="text-xs text-gray-700 leading-snug">${gas.property}</p>
+                                </div>
+
+                                <!-- 이용 사례 -->
+                                <div class="mb-2 bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                                    <h4 class="text-xs font-bold text-emerald-800 mb-1">💡 이용 사례</h4>
+                                    <p class="text-xs text-gray-700 leading-snug">${gas.usage}</p>
+                                </div>
+                            </div>
+                            <div class="text-center text-xs text-gray-400 font-medium">탐험 완료! 🌟</div>
+                        </div>
+
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 퀴즈 목록 렌더링
+        function renderQuizModal() {
+            const container = document.getElementById('quiz-list-container');
+            container.innerHTML = gases.map((gas, idx) => `
+                <div class="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-200">
+                    <p class="font-bold text-gray-800 text-sm md:text-base mb-3">${gas.quiz.question}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        ${gas.quiz.options.map((opt, optIdx) => `
+                            <button onclick="checkModalQuiz(this, ${optIdx}, ${gas.quiz.answer})" 
+                                class="text-xs md:text-sm p-2.5 bg-white border border-indigo-200 rounded-xl text-indigo-900 font-medium hover:bg-indigo-100 transition text-left px-3">
+                                ${optIdx + 1}. ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <p class="quiz-feedback text-xs font-bold text-center mt-2 hidden"></p>
+                </div>
+            `).join('');
+        }
+
+        // 카드 뒤집기
+        function flipCard(cardEl) {
+            cardEl.classList.toggle('flipped');
+        }
+
+        // 다시 뒤집기 버튼
+        function unflipCard(btnEl) {
+            const card = btnEl.closest('.card');
+            card.classList.remove('flipped');
+        }
+
+        // 모달 열기/닫기
+        function openQuizModal() {
+            renderQuizModal();
+            document.getElementById('quiz-modal').classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.add('flex');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quiz-modal').classList.remove('flex');
+            document.getElementById('quiz-modal').classList.add('hidden');
+        }
+
+        // 퀴즈 정답 체크
+        function checkModalQuiz(btnEl, selectedIdx, correctIdx) {
+            const parentQuizBox = btnEl.closest('.bg-indigo-50\\/60');
+            const feedbackEl = parentQuizBox.querySelector('.quiz-feedback');
+            
+            feedbackEl.classList.remove('hidden');
+            if (selectedIdx === correctIdx) {
+                feedbackEl.textContent = "🎉 정답입니다! 참 잘했어요! 👏";
+                feedbackEl.className = "quiz-feedback text-xs font-bold text-center mt-2 text-emerald-600";
+            } else {
+                feedbackEl.textContent = "❌ 아쉽네요! 다시 생각해 볼까요? 💪";
+                feedbackEl.className = "quiz-feedback text-xs font-bold text-center mt-2 text-rose-500";
+            }
+        }
+
+        // 초기 실행
+        renderCards();
+    </script>
+</body>
+</html>
